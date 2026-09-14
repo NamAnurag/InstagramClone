@@ -7,6 +7,12 @@ export const sendMessage = async (req,res) => {
         const senderId = req.id;
         const receiverId = req.params.id;
         const {textMessage:message} = req.body;
+        if (!message?.trim()) {
+            return res.status(400).json({
+                success: false,
+                message: 'Message is required'
+            });
+        }
       
         let conversation = await Conversation.findOne({
             participants:{$all:[senderId, receiverId]}
@@ -20,7 +26,7 @@ export const sendMessage = async (req,res) => {
         const newMessage = await Message.create({
             senderId,
             receiverId,
-            message
+            message: message.trim()
         });
         if(newMessage) conversation.messages.push(newMessage._id);
 

@@ -4,11 +4,11 @@ import LeftSidebar from './LeftSidebar'
 
 const MainLayout = () => {
   return (
-    <div>
-         <LeftSidebar/>
-        <div>
-            <Outlet/>
-        </div>
+    <div className='flex'>
+      <LeftSidebar />
+      <div className='flex-1 ml-[240px]'>
+        <Outlet />
+      </div>
     </div>
   )
 }

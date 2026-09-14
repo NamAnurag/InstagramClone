@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPosts } from '@/redux/postSlice';
+import { API_BASE_URL } from '@/lib/api';
 
 const CreatePost = ({ open, setOpen }) => {
   const imageRef = useRef();
@@ -29,13 +30,13 @@ const CreatePost = ({ open, setOpen }) => {
     }
   }
 
-  const createPostHandler = async (e) => {
+  const createPostHandler = async () => {
     const formData = new FormData();
     formData.append("caption", caption);
     if (imagePreview) formData.append("image", file);
     try {
       setLoading(true);
-      const res = await axios.post('http://localhost:8000/api/v1/post/addpost', formData, {
+      const res = await axios.post(`${API_BASE_URL}/api/v1/post/addpost`, formData, {
   headers: {
     'Content-Type': 'multipart/form-data'
   },
@@ -44,18 +45,28 @@ const CreatePost = ({ open, setOpen }) => {
       if (res.data.success) {
         dispatch(setPosts([res.data.post, ...posts]));// [1] -> [1,2] -> total element = 2
         toast.success(res.data.message);
+        setCaption("");
+        setFile("");
+        setImagePreview("");
         setOpen(false);
       }
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Failed to create post");
     } finally {
       setLoading(false);
     }
   }
 
+  const handleClose = () => {
+    setCaption("");
+    setFile("");
+    setImagePreview("");
+    setOpen(false);
+  }
+
   return (
     <Dialog open={open}>
-      <DialogContent onInteractOutside={() => setOpen(false)}>
+      <DialogContent onInteractOutside={handleClose}>
         <DialogHeader className='text-center font-semibold'>Create New Post</DialogHeader>
         <div className='flex gap-3 items-center'>
           <Avatar>
